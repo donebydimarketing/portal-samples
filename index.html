@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Done by Di — Member Portal Concept v2</title>
+<style>
+  :root{
+    --black:#0A0A0A; --white:#FFFFFF; --paper:#FAFAF8; --line:#E4E2DC;
+    --gray:#6B6B6B; --gray-light:#9C9A93; --card-bg:#F1EFE8;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--paper); color:var(--black); min-height:100vh; -webkit-font-smoothing:antialiased;
+  }
+  .mono{ font-family:"SF Mono",Consolas,"Courier New",monospace; letter-spacing:0.02em; }
+
+  .demo-bar{
+    background:#0A0A0A; color:#fff; display:flex; align-items:center; justify-content:space-between;
+    padding:11px 24px; font-size:11.5px; position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:10px;
+  }
+  .demo-bar .label{ color:#999; letter-spacing:0.08em; text-transform:uppercase; font-size:10px;}
+  .demo-tabs{ display:flex; gap:6px; }
+  .demo-tabs button{ background:transparent; border:1px solid #333; color:#BBB; padding:6px 14px; font-size:12px; border-radius:5px; cursor:pointer; font-family:inherit;}
+  .demo-tabs button.active{ background:#fff; color:#0A0A0A; border-color:#fff; font-weight:700;}
+
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  /* PHOTO PLACEHOLDER TREATMENT — clearly marked, swap with real licensed photos before sending to anyone */
+  .photo-slot{
+    background:repeating-linear-gradient(45deg, #EDEAE1, #EDEAE1 10px, #E3DFD3 10px, #E3DFD3 20px);
+    display:flex; align-items:center; justify-content:center; color:#A8A395; font-size:11px;
+    text-align:center; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; position:relative;
+    overflow:hidden;
+  }
+  .photo-slot::before{ content:"\1F4F7  PHOTO"; }
+  .photo-slot img{ width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1; }
+  .photo-slot:has(img)::before{ display:none; }
+
+  /* ============ TOP NAV (within the portal page itself) ============ */
+  .topnav{
+    background:#fff; border-bottom:1px solid var(--line); padding:16px 40px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .topnav .brand{ font-weight:800; font-size:16px; letter-spacing:-0.01em; }
+  .topnav .links{ display:flex; gap:28px; font-size:13px; color:var(--gray); font-weight:600; }
+  .topnav .links a{ color:var(--gray); margin-right:28px; }
+  .topnav .links a:last-child{ margin-right:0; }
+  .topnav .actions{ display:flex; gap:10px; align-items:center; }
+  .btn-outline{ border:1px solid var(--line); background:#fff; padding:8px 16px; border-radius:20px; font-size:13px; font-weight:700; }
+  .btn-solid{ border:none; background:var(--black); color:#fff; padding:9px 18px; border-radius:20px; font-size:13px; font-weight:700; }
+
+  /* ============ HERO ============ */
+  .hero{ background:var(--paper); padding:54px 40px 60px; }
+  .hero-inner{ max-width:1180px; margin:0 auto; display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px; align-items:center; }
+  .hero-eyebrow{ font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); font-weight:700; margin-bottom:14px; }
+  .hero h1{ font-size:54px; line-height:0.98; font-weight:800; letter-spacing:-0.02em; margin-bottom:22px; }
+  .hero h1 .accent{ -webkit-text-stroke:2px var(--black); color:transparent; }
+  .hero-sub{ font-size:15px; color:var(--gray); line-height:1.6; max-width:440px; margin-bottom:28px; }
+  .search-bar{ display:flex; gap:0; max-width:480px; border:1.5px solid var(--black); border-radius:30px; padding:5px; margin-bottom:18px; }
+  .search-bar input{ flex:1; border:none; background:transparent; padding:9px 16px; font-size:13.5px; font-family:inherit; }
+  .search-bar button{ background:var(--black); color:#fff; border:none; border-radius:24px; padding:9px 22px; font-size:13px; font-weight:700; }
+  .tag-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{ font-size:12px; border:1px solid var(--line); border-radius:16px; padding:5px 13px; color:var(--gray); font-weight:600;}
+
+  .hero-photo{ position:relative; }
+  .hero-photo .photo-slot{ width:100%; height:420px; border-radius:18px; }
+  .hero-badge{
+    position:absolute; bottom:18px; left:18px; background:#fff; border-radius:12px; padding:10px 14px;
+    box-shadow:0 8px 24px -8px rgba(0,0,0,0.18); display:flex; gap:10px; align-items:center; max-width:220px;
+  }
+  .hero-badge .av{ width:34px; height:34px; border-radius:50%; background:var(--black); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0;}
+  .hero-badge .name{ font-size:12.5px; font-weight:700; }
+  .hero-badge .role{ font-size:10.5px; color:var(--gray-light); }
+  .trust-strip{ display:flex; align-items:center; gap:14px; margin-top:18px; }
+  .trust-strip .avs{ display:flex; }
+  .trust-strip .avs .av2{ width:30px; height:30px; border-radius:50%; background:var(--card-bg); border:2px solid #fff; margin-left:-8px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; color:var(--gray); }
+  .trust-strip .avs .av2:first-child{ margin-left:0; }
+  .trust-text{ font-size:12px; color:var(--gray); }
+  .trust-text strong{ display:block; font-size:13px; color:var(--black); }
+
+  /* ============ SERVICES GRID ============ */
+  .section{ max-width:1180px; margin:0 auto; padding:50px 40px; }
+  .section-head{ text-align:center; margin-bottom:34px; }
+  .section-head .eyebrow{ font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); font-weight:700; margin-bottom:10px; }
+  .section-head h2{ font-size:30px; font-weight:800; letter-spacing:-0.01em; }
+
+  .services-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  .svc-card{ border-radius:16px; overflow:hidden; background:#fff; border:1px solid var(--line); }
+  .svc-card .photo-slot{ height:140px; }
+  .svc-card .svc-body{ padding:16px; }
+  .svc-card h4{ font-size:14.5px; font-weight:800; margin-bottom:6px; }
+  .svc-card .svc-tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .svc-card .svc-tags span{ font-size:10.5px; color:var(--gray); background:var(--card-bg); border-radius:10px; padding:3px 9px; font-weight:600;}
+
+  /* ============ WHY / TRUST BAND ============ */
+  .why-band{ background:var(--black); color:#fff; padding:54px 40px; }
+  .why-inner{ max-width:1180px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:50px; align-items:center; }
+  .why-inner .photo-slot{ height:340px; border-radius:16px; filter:invert(1) brightness(0.4); }
+  .why-eyebrow{ font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#9C9A93; font-weight:700; margin-bottom:14px; }
+  .why-inner h2{ font-size:28px; font-weight:800; margin-bottom:22px; letter-spacing:-0.01em; }
+  .why-list{ display:flex; flex-direction:column; gap:16px; }
+  .why-item{ display:flex; gap:13px; align-items:flex-start; }
+  .why-icon{ width:30px; height:30px; border-radius:8px; background:#1C1C1C; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px; font-weight:800; color:#fff; }
+  .why-item .t{ font-size:14px; font-weight:700; margin-bottom:2px; }
+  .why-item .d{ font-size:12.5px; color:#9C9A93; line-height:1.5; }
+
+  /* ============ PROFILE PAGE ============ */
+  .profile-wrap{ max-width:1180px; margin:0 auto; padding:40px; display:grid; grid-template-columns:260px 1fr; gap:28px; }
+  .profile-side{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; height:fit-content; }
+  .profile-side .photo-slot{ width:84px; height:84px; border-radius:50%; margin:0 auto 14px; }
+  .profile-side .pname{ text-align:center; font-weight:800; font-size:16px; margin-bottom:2px; }
+  .profile-side .prole{ text-align:center; font-size:12.5px; color:var(--gray); margin-bottom:18px; }
+  .profile-nav-item{ padding:10px 12px; border-radius:8px; font-size:13px; font-weight:600; color:var(--gray); margin-bottom:2px; }
+  .profile-nav-item.current{ background:var(--black); color:#fff; }
+
+  .profile-main{ display:flex; flex-direction:column; gap:18px; }
+  .pcard{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px 26px; }
+  .pcard-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .pcard-head h3{ font-size:15px; font-weight:800; }
+  .pcard-head a{ font-size:12px; color:var(--gray); font-weight:700; text-decoration:underline; }
+  .pfield{ display:grid; grid-template-columns:160px 1fr; padding:11px 0; border-top:1px solid var(--line); font-size:13.5px; }
+  .pfield:first-child{ border-top:none; }
+  .pfield .k{ color:var(--gray); font-weight:600; }
+  .pfield .v{ font-weight:600; }
+
+  /* ============ DIRECTORY TABLE ============ */
+  .dir-wrap{ max-width:1180px; margin:0 auto; padding:40px; }
+  .dir-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:14px;}
+  .dir-head h2{ font-size:24px; font-weight:800; }
+  .dir-search{ display:flex; gap:8px; }
+  .dir-search input{ border:1px solid var(--line); border-radius:8px; padding:9px 13px; font-size:13px; font-family:inherit; min-width:220px;}
+  .dir-search button{ background:var(--black); color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; }
+  .dir-grid{ display:grid; grid-template-columns:200px 1fr; gap:24px; }
+  .dir-filters{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px; height:fit-content; }
+  .dir-filters .f-label{ font-size:11px; text-transform:uppercase; letter-spacing:0.07em; font-weight:800; color:var(--gray); margin:14px 0 8px; }
+  .dir-filters .f-label:first-child{ margin-top:0; }
+  .dir-filters label{ display:flex; align-items:center; gap:8px; font-size:13px; padding:4px 0; color:var(--gray); }
+
+  .dir-table{ width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .dir-table th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--gray); font-weight:800; padding:13px 16px; background:var(--paper); border-bottom:1px solid var(--line); }
+  .dir-table td{ padding:13px 16px; font-size:13px; border-bottom:1px solid var(--line); }
+  .dir-table tr:last-child td{ border-bottom:none; }
+  .dir-avatar{ width:26px; height:26px; border-radius:50%; background:var(--black); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; margin-right:8px; vertical-align:middle; }
+  .dir-pager{ display:flex; justify-content:center; gap:6px; margin-top:18px; }
+  .dir-pager button{ width:30px; height:30px; border:1px solid var(--line); background:#fff; border-radius:7px; font-size:12px; font-weight:700; }
+  .dir-pager button.current{ background:var(--black); color:#fff; border-color:var(--black); }
+
+  .credit{ text-align:center; padding:20px 0; font-size:10.5px; color:var(--gray-light); }
+  .note-banner{
+    background:#FFF8E8; border:1px solid #F0DDA8; color:#8A6D1F; font-size:12px; text-align:center;
+    padding:9px 16px; font-weight:600;
+  }
+
+  @media (max-width:900px){
+    .hero-inner, .why-inner{ grid-template-columns:1fr; }
+    .services-grid{ grid-template-columns:repeat(2,1fr); }
+    .profile-wrap, .dir-grid{ grid-template-columns:1fr; }
+    .hero h1{ font-size:38px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-bar">
+  <span class="label mono">Done by Di — Portal Concept v2 (Elevated)</span>
+  <div class="demo-tabs">
+    <button class="active" data-view="landing" onclick="setView('landing', this)">Landing / Dashboard</button>
+    <button data-view="profile" onclick="setView('profile', this)">My Profile</button>
+    <button data-view="directory" onclick="setView('directory', this)">Member Directory</button>
+  </div>
+</div>
+
+<div class="note-banner">All photo zones are placeholders — swap in licensed stock or real photos before sending to anyone</div>
+
+<!-- ============ LANDING / DASHBOARD VIEW ============ -->
+<div class="view active" id="view-landing">
+  <div class="topnav">
+    <div class="brand">Done by Di</div>
+    <div class="links"><a href="#">Library</a><a href="#">Updates</a><a href="#">Resources</a><a href="#">Support</a></div>
+    <div class="actions"><button class="btn-outline">Log out</button></div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow">Member Portal</div>
+        <h1>Welcome<br>back, <span class="accent">Tanya</span></h1>
+        <div class="hero-sub">Your video bank, podcast archive, and newsletters, all organized in one place built around how you actually work, not a generic template.</div>
+        <div class="search-bar">
+          <input placeholder="Search your library...">
+          <button>Search</button>
+        </div>
+        <div class="tag-row">
+          <span class="tag">Video Bank</span><span class="tag">Podcast Archive</span><span class="tag">Newsletters</span><span class="tag">Resource Vault</span>
+        </div>
+      </div>
+      <div class="hero-photo">
+        <div class="photo-slot" style="height:420px; border-radius:18px;"><img src="https://images.pexels.com/photos/19338521/pexels-photo-19338521.jpeg" alt="Hero"></div>
+        <div class="hero-badge">
+          <div class="av">TB</div>
+          <div><div class="name">Tanya Barnes</div><div class="role">Member since 2026</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-inner" style="margin-top:8px; grid-template-columns:1fr;">
+      <div class="trust-strip">
+        <div class="avs"><div class="av2">JR</div><div class="av2">TK</div><div class="av2">SO</div><div class="av2">+21</div></div>
+        <div class="trust-text"><strong>24 active members</strong>using this library every week</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="eyebrow">Your Library</div>
+      <h2>Everything in one place</h2>
+    </div>
+    <div class="services-grid">
+      <div class="svc-card"><div class="photo-slot"><img src="https://images.pexels.com/photos/26803902/pexels-photo-26803902.jpeg" alt="Video Bank"></div><div class="svc-body"><h4>Video Bank</h4><div class="svc-tags"><span>42 items</span><span>68% watched</span></div></div></div>
+      <div class="svc-card"><div class="photo-slot"><img src="https://images.pexels.com/photos/6919953/pexels-photo-6919953.jpeg" alt="Podcast Archive"></div><div class="svc-body"><h4>Podcast Archive</h4><div class="svc-tags"><span>19 episodes</span><span>40% played</span></div></div></div>
+      <div class="svc-card"><div class="photo-slot"><img src="https://images.pexels.com/photos/14656904/pexels-photo-14656904.jpeg" alt="Newsletters"></div><div class="svc-body"><h4>Newsletters</h4><div class="svc-tags"><span>12 issues</span><span>All caught up</span></div></div></div>
+      <div class="svc-card"><div class="photo-slot"><img src="https://images.pexels.com/photos/29807086/pexels-photo-29807086.jpeg" alt="Resource Vault"></div><div class="svc-body"><h4>Resource Vault</h4><div class="svc-tags"><span>9 files</span><span>22% downloaded</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="why-band">
+    <div class="why-inner">
+      <div>
+        <div class="why-eyebrow">Why This Library</div>
+        <h2>Built for how you actually grow, not a generic template</h2>
+        <div class="why-list">
+          <div class="why-item"><div class="why-icon">1</div><div><div class="t">Systems, not just content</div><div class="d">Every asset here is part of a working system, repurposed from real source material.</div></div></div>
+          <div class="why-item"><div class="why-icon">2</div><div><div class="t">Built by a Digital Marketing Engineer</div><div class="d">9+ years building growth infrastructure, not just posting on a schedule.</div></div></div>
+          <div class="why-item"><div class="why-icon">3</div><div><div class="t">Real results behind it</div><div class="d">$22M in grants secured, 350+ VAs trained, 1M+ followers managed across client accounts.</div></div></div>
+        </div>
+      </div>
+      <div class="photo-slot"><img src="https://images.pexels.com/photos/8569471/pexels-photo-8569471.jpeg" alt="Why this library"></div>
+    </div>
+  </div>
+
+  <div class="credit">Built by Done by Di — Digital Marketing Engineer &amp; Growth Lab</div>
+</div>
+
+<!-- ============ PROFILE VIEW ============ -->
+<div class="view" id="view-profile">
+  <div class="topnav">
+    <div class="brand">Done by Di</div>
+    <div class="links"><a href="#">Library</a><a href="#">Updates</a><a href="#">Resources</a><a href="#">Support</a></div>
+    <div class="actions"><button class="btn-outline">Log out</button></div>
+  </div>
+
+  <div class="profile-wrap">
+    <div class="profile-side">
+      <div class="photo-slot"></div>
+      <div class="pname">Tanya Barnes</div>
+      <div class="prole">Member since 2026</div>
+      <div class="profile-nav-item current">My Info</div>
+      <div class="profile-nav-item">My Access</div>
+      <div class="profile-nav-item">Engagement</div>
+      <div class="profile-nav-item">Notifications</div>
+      <div class="profile-nav-item">Payment Methods</div>
+    </div>
+    <div class="profile-main">
+      <div class="pcard">
+        <div class="pcard-head"><h3>Contact Information</h3><a href="#">Change</a></div>
+        <div class="pfield"><div class="k">Full Name</div><div class="v">Tanya Barnes</div></div>
+        <div class="pfield"><div class="k">Email</div><div class="v">tanya@example.com</div></div>
+        <div class="pfield"><div class="k">Phone</div><div class="v">+1 (602) 555-0148</div></div>
+        <div class="pfield"><div class="k">Directory Visibility</div><div class="v">Visible to other members</div></div>
+      </div>
+      <div class="pcard">
+        <div class="pcard-head"><h3>Membership</h3><a href="#">Change</a></div>
+        <div class="pfield"><div class="k">Join Date</div><div class="v">Jan 14, 2026</div></div>
+        <div class="pfield"><div class="k">Access Level</div><div class="v">Active member</div></div>
+        <div class="pfield"><div class="k">Renewal Date</div><div class="v">Jan 14, 2027</div></div>
+      </div>
+      <div class="pcard">
+        <div class="pcard-head"><h3>Engagement</h3></div>
+        <div class="pfield"><div class="k">Last Login</div><div class="v">Today</div></div>
+        <div class="pfield"><div class="k">Items Viewed</div><div class="v">61 of 82</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="credit">Built by Done by Di — Digital Marketing Engineer &amp; Growth Lab</div>
+</div>
+
+<!-- ============ DIRECTORY VIEW ============ -->
+<div class="view" id="view-directory">
+  <div class="topnav">
+    <div class="brand">Done by Di</div>
+    <div class="links"><a href="#">Library</a><a href="#">Updates</a><a href="#">Resources</a><a href="#">Support</a></div>
+    <div class="actions"><button class="btn-outline">Log out</button></div>
+  </div>
+
+  <div class="dir-wrap">
+    <div class="dir-head">
+      <h2>Member directory</h2>
+      <div class="dir-search"><input placeholder="Search members..."><button>Search</button></div>
+    </div>
+    <div class="dir-grid">
+      <div class="dir-filters">
+        <div class="f-label">Access Level</div>
+        <label><input type="checkbox" checked> Active</label>
+        <label><input type="checkbox"> Pending</label>
+        <div class="f-label">Joined</div>
+        <label><input type="checkbox"> This month</label>
+        <label><input type="checkbox"> This year</label>
+        <div class="f-label">Engagement</div>
+        <label><input type="checkbox"> High activity</label>
+        <label><input type="checkbox"> Low activity</label>
+      </div>
+      <div>
+        <table class="dir-table">
+          <tr><th>Member</th><th>Email</th><th>Status</th><th>Joined</th><th>Last Active</th></tr>
+          <tr><td><span class="dir-avatar">JR</span>Jamie Reyes</td><td>jamie@example.com</td><td>Active</td><td>May 3, 2026</td><td>Today</td></tr>
+          <tr><td><span class="dir-avatar">TK</span>Tasha King</td><td>tasha@example.com</td><td>Active</td><td>Apr 18, 2026</td><td>Yesterday</td></tr>
+          <tr><td><span class="dir-avatar">PM</span>Priya Mehta</td><td>priya@example.com</td><td>Pending</td><td>Jun 22, 2026</td><td>—</td></tr>
+          <tr><td><span class="dir-avatar">SO</span>Sam Okafor</td><td>sam@example.com</td><td>Active</td><td>Mar 11, 2026</td><td>3 days ago</td></tr>
+          <tr><td><span class="dir-avatar">LM</span>Liam Murphy</td><td>liam@example.com</td><td>Active</td><td>Feb 2, 2026</td><td>1 week ago</td></tr>
+        </table>
+        <div class="dir-pager"><button class="current">1</button><button>2</button><button>3</button><button>›</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="credit">Built by Done by Di — Digital Marketing Engineer &amp; Growth Lab</div>
+</div>
+
+<script>
+function setView(name, btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.demo-tabs button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+
+</body>
+</html>
