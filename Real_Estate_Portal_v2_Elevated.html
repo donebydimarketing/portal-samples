@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Landlord Group — Member Portal Concept v2</title>
+<style>
+  :root{
+    --navy:#101F3D; --navy2:#16285A; --orange:#E8542C; --paper:#F4F6FB; --line:#E2E6EF;
+    --gray:#5B6478; --gray-light:#8B92A3;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;
+    background:var(--paper); color:var(--navy); min-height:100vh;
+  }
+
+  .demo-bar{
+    background:#0A0A0A; color:#fff; display:flex; align-items:center; justify-content:space-between;
+    padding:11px 24px; font-size:11.5px; position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:10px;
+  }
+  .demo-bar .label{ color:#999; letter-spacing:0.08em; text-transform:uppercase; font-size:10px;}
+  .demo-tabs{ display:flex; gap:6px; }
+  .demo-tabs button{ background:transparent; border:1px solid #333; color:#BBB; padding:6px 14px; font-size:12px; border-radius:5px; cursor:pointer; font-family:inherit;}
+  .demo-tabs button.active{ background:#fff; color:#0A0A0A; border-color:#fff; font-weight:700;}
+  .note-banner{ background:#FFF8E8; border:1px solid #F0DDA8; color:#8A6D1F; font-size:12px; text-align:center; padding:9px 16px; font-weight:600; }
+
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  .photo-slot{
+    background:repeating-linear-gradient(45deg, #E4E8F2, #E4E8F2 10px, #DADFEC 10px, #DADFEC 20px);
+    display:flex; align-items:center; justify-content:center; color:#9CA3B8; font-size:11px;
+    font-weight:700; letter-spacing:0.04em; text-transform:uppercase; position:relative; overflow:hidden;
+  }
+  .photo-slot::before{ content:"\1F4F7  PHOTO"; }
+  .photo-slot img{ width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1; }
+  .photo-slot:has(img)::before{ display:none; }
+
+  .topnav{ background:#fff; border-bottom:1px solid var(--line); padding:14px 40px; display:flex; align-items:center; justify-content:space-between; }
+  .tn-brand{ display:flex; align-items:center; gap:10px; }
+  .tn-logo{ width:32px; height:32px; background:var(--navy); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:800; }
+  .tn-name{ font-weight:800; font-size:15px; }
+  .tn-links{ display:flex; }
+  .tn-links a{ color:var(--gray); font-size:13px; font-weight:700; margin-right:26px; }
+  .tn-links a:last-child{ margin-right:0; }
+  .tn-actions{ display:flex; align-items:center; gap:10px; }
+  .av-circle{ width:32px; height:32px; border-radius:50%; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; }
+
+  .welcome-hero{ position:relative; margin:24px 40px 0; border-radius:16px; overflow:hidden; height:230px; }
+  .welcome-hero .photo-slot{ position:absolute; inset:0; }
+  .welcome-overlay{ position:absolute; inset:0; background:linear-gradient(120deg, rgba(16,31,61,0.92) 0%, rgba(16,31,61,0.55) 60%, rgba(16,31,61,0.25) 100%); display:flex; flex-direction:column; justify-content:center; padding:0 44px; }
+  .welcome-overlay .eyebrow{ color:#B9C2DC; font-size:12px; font-weight:700; margin-bottom:8px; }
+  .welcome-overlay h1{ color:#fff; font-size:30px; font-weight:800; max-width:520px; }
+
+  .ql-wrap{ max-width:1180px; margin:0 auto; padding:34px 40px 10px; display:grid; grid-template-columns:1.6fr 1fr; gap:24px; }
+  .ql-card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:24px; }
+  .ql-card h3{ font-size:14px; font-weight:800; margin-bottom:16px; color:var(--navy); }
+  .ql-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .ql-btn{ background:var(--orange); color:#fff; border:none; border-radius:10px; padding:16px 14px; font-size:12.5px; font-weight:700; text-align:left; }
+  .ql-btn.alt{ background:var(--navy); }
+
+  .whatsnew{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; }
+  .whatsnew h3{ font-size:14px; font-weight:800; margin-bottom:14px; }
+  .wn-item{ display:flex; gap:12px; align-items:flex-start; margin-bottom:14px; }
+  .wn-item .photo-slot{ width:54px; height:54px; border-radius:8px; flex-shrink:0; font-size:8px; }
+  .wn-item .wn-text{ font-size:12.5px; font-weight:700; line-height:1.4; }
+  .wn-item .wn-date{ font-size:11px; color:var(--gray-light); margin-top:3px; }
+
+  .promo-strip{ max-width:1180px; margin:24px auto; padding:0 40px; }
+  .promo-card{ background:var(--navy); border-radius:14px; padding:26px 32px; display:flex; justify-content:space-between; align-items:center; color:#fff; flex-wrap:wrap; gap:14px; }
+  .promo-card h3{ font-size:17px; font-weight:800; margin-bottom:6px; }
+  .promo-card p{ font-size:13px; color:#B9C2DC; }
+  .promo-card button{ background:var(--orange); border:none; color:#fff; padding:11px 22px; border-radius:8px; font-size:13px; font-weight:700; }
+
+  .pfoot{ background:var(--navy2); color:#fff; margin-top:30px; padding:40px; }
+  .pfoot-inner{ max-width:1180px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr; gap:30px; }
+  .pfoot h4{ font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:#8E9BC2; margin-bottom:12px; }
+  .pfoot p, .pfoot a{ font-size:13px; color:#D5DAEA; line-height:1.7; }
+  .pfoot button{ background:var(--orange); border:none; color:#fff; padding:10px 18px; border-radius:8px; font-size:13px; font-weight:700; margin-top:8px; }
+
+  .profile-wrap{ max-width:1180px; margin:0 auto; padding:34px 40px; display:grid; grid-template-columns:230px 1fr; gap:24px; }
+  .profile-side{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:22px; height:fit-content; }
+  .profile-side .photo-slot{ width:74px; height:74px; border-radius:50%; margin:0 auto 12px; font-size:8px; }
+  .profile-side .pname{ text-align:center; font-weight:800; font-size:15px; }
+  .profile-side .prole{ text-align:center; font-size:12px; color:var(--gray); margin-bottom:16px; }
+  .pnav-item{ padding:10px 12px; border-radius:8px; font-size:13px; font-weight:700; color:var(--gray); margin-bottom:2px; }
+  .pnav-item.current{ background:var(--navy); color:#fff; }
+
+  .profile-main{ display:flex; flex-direction:column; gap:16px; }
+  .pcard{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:22px 26px; }
+  .pcard-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .pcard-head h3{ font-size:14px; font-weight:800; color:var(--navy); }
+  .pcard-head a{ font-size:12px; color:var(--orange); font-weight:800; }
+  .pfield{ display:grid; grid-template-columns:170px 1fr; padding:10px 0; border-top:1px solid var(--line); font-size:13px; }
+  .pfield:first-child{ border-top:none; }
+  .pfield .k{ color:var(--gray); font-weight:600; }
+  .pfield .v{ font-weight:700; }
+
+  .dir-wrap{ max-width:1180px; margin:0 auto; padding:34px 40px; }
+  .dir-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; }
+  .dir-head h2{ font-size:22px; font-weight:800; color:var(--navy); }
+  .dir-search{ display:flex; gap:8px; }
+  .dir-search input{ border:1px solid var(--line); border-radius:8px; padding:9px 13px; font-size:13px; font-family:inherit; min-width:240px; }
+  .dir-search button{ background:var(--orange); color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; }
+  .dir-grid{ display:grid; grid-template-columns:200px 1fr; gap:20px; }
+  .dir-filters{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:18px; height:fit-content; }
+  .f-label{ font-size:11px; text-transform:uppercase; letter-spacing:0.06em; font-weight:800; color:var(--gray); margin:14px 0 8px; }
+  .f-label:first-child{ margin-top:0; }
+  .dir-filters label{ display:block; font-size:12.5px; padding:4px 0; color:var(--gray); }
+  .dir-filters label.sel{ color:var(--orange); font-weight:800; }
+
+  .dir-table{ width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .dir-table th{ text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--gray); font-weight:800; padding:12px 16px; background:var(--paper); border-bottom:1px solid var(--line); }
+  .dir-table td{ padding:12px 16px; font-size:12.5px; border-bottom:1px solid var(--line); }
+  .dir-table tr:last-child td{ border-bottom:none; }
+  .dir-avatar{ width:24px; height:24px; border-radius:50%; background:var(--navy); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:800; margin-right:8px; vertical-align:middle; }
+  .dir-pager{ display:flex; justify-content:center; gap:6px; margin-top:16px; }
+  .dir-pager button{ width:28px; height:28px; border:1px solid var(--line); background:#fff; border-radius:6px; font-size:12px; font-weight:700; }
+  .dir-pager button.current{ background:var(--navy); color:#fff; border-color:var(--navy); }
+
+  .credit{ text-align:center; padding:18px 0; font-size:10.5px; color:var(--gray-light); }
+
+  @media (max-width:900px){
+    .ql-wrap, .profile-wrap, .dir-grid{ grid-template-columns:1fr; }
+    .pfoot-inner{ grid-template-columns:1fr; }
+    .ql-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-bar">
+  <span class="label">The Landlord Group — Portal Concept v2 (Elevated)</span>
+  <div class="demo-tabs">
+    <button class="active" data-view="landing" onclick="setView('landing', this)">Landing / Dashboard</button>
+    <button data-view="profile" onclick="setView('profile', this)">My Profile</button>
+    <button data-view="directory" onclick="setView('directory', this)">Member Directory</button>
+  </div>
+</div>
+<div class="note-banner">All photo zones are placeholders — swap in licensed stock or real photos before sending to anyone</div>
+
+<div class="view active" id="view-landing">
+  <div class="topnav">
+    <div class="tn-brand"><div class="tn-logo">TL</div><div class="tn-name">The Landlord Group</div></div>
+    <div class="tn-links"><a href="#">Get Involved</a><a href="#">Collaborate</a><a href="#">Events</a><a href="#">Directory</a></div>
+    <div class="tn-actions"><div class="av-circle">JR</div></div>
+  </div>
+
+  <div class="welcome-hero">
+    <div class="photo-slot"><img src="https://images.pexels.com/photos/20296261/pexels-photo-20296261.jpeg" alt="Welcome hero"></div>
+    <div class="welcome-overlay">
+      <div class="eyebrow">MEMBER PORTAL</div>
+      <h1>Welcome to your portal, Jamie Reyes!</h1>
+    </div>
+  </div>
+
+  <div class="ql-wrap">
+    <div class="ql-card">
+      <h3>Quick Links</h3>
+      <div class="ql-grid">
+        <button class="ql-btn">My Profile</button>
+        <button class="ql-btn">Investor Contacts</button>
+        <button class="ql-btn alt">Motivated Seller Leads</button>
+        <button class="ql-btn alt">PM Directory</button>
+        <button class="ql-btn">Resource Vault</button>
+        <button class="ql-btn alt">Member Directory</button>
+      </div>
+    </div>
+    <div class="whatsnew">
+      <h3>What's New</h3>
+      <div class="wn-item">
+        <div class="photo-slot"><img src="https://images.pexels.com/photos/7937959/pexels-photo-7937959.jpeg" alt="Update"></div>
+        <div><div class="wn-text">New investor contacts added across Tampa &amp; Brandon FL</div><div class="wn-date">2 days ago</div></div>
+      </div>
+      <div class="wn-item">
+        <div class="photo-slot"><img src="https://images.pexels.com/photos/7937753/pexels-photo-7937753.jpeg" alt="Update"></div>
+        <div><div class="wn-text">Q3 property manager directory refresh now live</div><div class="wn-date">5 days ago</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="promo-strip">
+    <div class="promo-card">
+      <div><h3>Looking for a property manager?</h3><p>Search the full PM directory by market, ready to filter and contact.</p></div>
+      <button onclick="setView('directory', document.querySelectorAll('[data-view=directory]')[0])">Go to directory</button>
+    </div>
+  </div>
+
+  <div class="pfoot">
+    <div class="pfoot-inner">
+      <div><h4>Contact Us</h4><p>Have a question about your access or a record in the library?</p><button>Send a Message</button></div>
+      <div><h4>Resources</h4><p><a href="#">Resource Vault</a><br><a href="#">PM Directory</a><br><a href="#">Investor Contacts</a></p></div>
+      <div><h4>Account</h4><p><a href="#">My Profile</a><br><a href="#">Privacy Policy</a><br><a href="#">Support</a></p></div>
+    </div>
+  </div>
+  <div class="credit">Built by Done by Di — Digital Marketing Engineer &amp; Growth Lab</div>
+</div>
+
+<div class="view" id="view-profile">
+  <div class="topnav">
+    <div class="tn-brand"><div class="tn-logo">TL</div><div class="tn-name">The Landlord Group</div></div>
+    <div class="tn-links"><a href="#">Get Involved</a><a href="#">Collaborate</a><a href="#">Events</a><a href="#">Directory</a></div>
+    <div class="tn-actions"><div class="av-circle">JR</div></div>
+  </div>
+
+  <div class="profile-wrap">
+    <div class="profile-side">
+      <div class="photo-slot"></div>
+      <div class="pname">Jamie Reyes</div>
+      <div class="prole">Member since 2026</div>
+      <div class="pnav-item current">My Info</div>
+      <div class="pnav-item">My Membership</div>
+      <div class="pnav-item">Engagement</div>
+      <div class="pnav-item">Social Networks</div>
+      <div class="pnav-item">Directory Instructions</div>
+      <div class="pnav-item">Payment Methods</div>
+    </div>
+    <div class="profile-main">
+      <div class="pcard">
+        <div class="pcard-head"><h3>My Info</h3><a href="#">Change</a></div>
+        <div class="pfield"><div class="k">Company Name</div><div class="v">Reyes Capital Holdings</div></div>
+        <div class="pfield"><div class="k">Job Title</div><div class="v">Acquisitions Lead</div></div>
+        <div class="pfield"><div class="k">Region</div><div class="v">Tampa, FL</div></div>
+      </div>
+      <div class="pcard">
+        <div class="pcard-head"><h3>Contact Information</h3><a href="#">Change</a></div>
+        <div class="pfield"><div class="k">Profile/Mail Type</div><div class="v">Personal</div></div>
+        <div class="pfield"><div class="k">Personal Email</div><div class="v">jamie@example.com</div></div>
+        <div class="pfield"><div class="k">Cell Phone</div><div class="v">+1 (813) 555-0102</div></div>
+      </div>
+      <div class="pcard">
+        <div class="pcard-head"><h3>Engagement</h3></div>
+        <div class="pfield"><div class="k">Join Date</div><div class="v">Apr 2026</div></div>
+        <div class="pfield"><div class="k">Membership Status</div><div class="v">Active</div></div>
+        <div class="pfield"><div class="k">Champion Level</div><div class="v">Referred by Tasha King</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="credit">Built by Done by Di — Digital Marketing Engineer &amp; Growth Lab</div>
+</div>
+
+<div class="view" id="view-directory">
+  <div class="topnav">
+    <div class="tn-brand"><div class="tn-logo">TL</div><div class="tn-name">The Landlord Group</div></div>
+    <div class="tn-links"><a href="#">Get Involved</a><a href="#">Collaborate</a><a href="#">Events</a><a href="#">Directory</a></div>
+    <div class="tn-actions"><div class="av-circle">JR</div></div>
+  </div>
+
+  <div class="dir-wrap">
+    <div class="dir-head">
+      <h2>Membership Directory</h2>
+      <div class="dir-search"><input placeholder="Search by name or company..."><button>Search</button></div>
+    </div>
+    <div class="dir-grid">
+      <div class="dir-filters">
+        <div class="f-label">Filter By</div>
+        <div class="f-label">Employer Type</div>
+        <label class="sel">All Employers</label>
+        <label>Property Manager</label>
+        <label>Investor</label>
+        <label>Developer</label>
+        <div class="f-label">Region</div>
+        <label>Tampa</label>
+        <label>New Port Richey</label>
+        <label>Brandon</label>
+        <label>Albany</label>
+      </div>
+      <div>
+        <table class="dir-table">
+          <tr><th>Name</th><th>Title</th><th>Company</th><th>Region</th></tr>
+          <tr><td><span class="dir-avatar">JR</span>Jamie Reyes</td><td>Acquisitions Lead</td><td>Reyes Capital Holdings</td><td>Tampa, FL</td></tr>
+          <tr><td><span class="dir-avatar">TK</span>Tasha King</td><td>Property Manager</td><td>King Realty Group</td><td>Brandon, FL</td></tr>
+          <tr><td><span class="dir-avatar">PM</span>Priya Mehta</td><td>Investor</td><td>Mehta Holdings</td><td>New Port Richey, FL</td></tr>
+          <tr><td><span class="dir-avatar">SO</span>Sam Okafor</td><td>Developer</td><td>Okafor Group</td><td>Albany, GA</td></tr>
+          <tr><td><span class="dir-avatar">LM</span>Liam Murphy</td><td>Property Manager</td><td>Murphy PM Services</td><td>Tampa, FL</td></tr>
+        </table>
+        <div class="dir-pager"><button class="current">1</button><button>2</button><button>3</button><button>4</button><button>›</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="credit">Built by Done by Di — Digital Marketing Engineer &amp; Growth Lab</div>
+</div>
+
+<script>
+function setView(name, btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.demo-tabs button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+
+</body>
+</html>
